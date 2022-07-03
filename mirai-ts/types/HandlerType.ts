@@ -13,6 +13,8 @@ export interface ReplyHandlerType extends DefaultHandlerType {
 	friendWhiteList: Array<number>
 	loadMod: () => void
 	validateWhiteList: (msg: MessageType.ChatMessage) => boolean
+	createConfigFile: () => void
+	mods: { [key: string]: () => ReplyModType }
 }
 /**
  * 暴露出来用于mod

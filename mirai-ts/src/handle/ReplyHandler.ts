@@ -3,21 +3,23 @@ import { ReplyConfigType } from '../../types/ReplyConfigType'
 import { DefaultHandler } from './DefaultHandler'
 import * as replyModList from '../mods/ReplyHandler'
 import { ReplyModType } from '../../types/HandlerType'
-
+import fs from 'fs'
+import path from 'path'
+import yaml from 'js-yaml'
 export class ReplyHandler extends DefaultHandler {
 	handler: true
 	groupWhiteList: Array<number>
 	friendWhiteList: Array<number>
-	mods: Array<ReplyModType>
-
+	mods: { [key: string]: ReplyModType }
 	constructor(replyConfig: ReplyConfigType) {
 		super()
 		this.handler = true
 		const { groupWhiteList, friendWhiteList } = replyConfig
 		this.groupWhiteList = groupWhiteList
 		this.friendWhiteList = friendWhiteList
-		this.mods = []
+		this.mods = {}
 		this.loadMod()
+		this.createConfigFile()
 	}
 	/**
 	 * 监听ChatMessage消息，然后从这里开始处理
@@ -31,9 +33,9 @@ export class ReplyHandler extends DefaultHandler {
 		}
 		this.log.info(this.msgLog(msg))
 
-		this.mods.forEach(mod => {
-			this.replyChatMessage(msg, mod.reply(msg.plain))
-		})
+		for (const [key, obj] of Object.entries(this.mods)) {
+			this.replyChatMessage(msg, obj.reply(msg.plain))
+		}
 	}
 	replyChatMessage(
 		msg: MessageType.ChatMessage,
@@ -45,19 +47,20 @@ export class ReplyHandler extends DefaultHandler {
 	 * 加载mod
 	 */
 	loadMod() {
-		for (const [_, obj] of Object.entries(replyModList)) {
+		for (const [name, obj] of Object.entries(replyModList)) {
 			const mod = obj()
 			const isReplyMod = this.isOfType<ReplyModType>(mod, 'replyHandler')
 			if (isReplyMod) {
-				this.mods.push(mod)
+				this.mods[name] = mod
 			}
 		}
-		if (this.mods.length === 0) {
+		if (Object.keys(this.mods).length === 0) {
 			this.log.info('没有任何mod被使用')
 		} else {
 			const avaMod: string[] = []
-			this.mods.forEach(mod => {
-				avaMod.push(mod.name)
+			const keys = Object.keys(this.mods)
+			keys.forEach(key => {
+				avaMod.push(this.mods[key].name)
 			})
 			this.log.success(`模块[${avaMod.join(',')}]加载成功`)
 		}
@@ -74,6 +77,32 @@ export class ReplyHandler extends DefaultHandler {
 				return this.friendWhiteList.includes(msg.sender.id)
 			case 'TempMessage':
 				return false
+		}
+	}
+	createConfigFile() {
+		const configTemplate: {
+			[key: string]: { name: string; keywords: string[] }
+		} = {}
+		for (const [key, obj] of Object.entries(this.mods)) {
+			configTemplate[key] = {
+				name: obj.name,
+				keywords: obj.keywords,
+			}
+		}
+		try {
+			let configContent = yaml.dump(configTemplate)
+			fs.writeFile(
+				path.resolve(__dirname, '../../config/ReplyModConfig.yml'),
+				configContent,
+				'utf-8',
+				err => {
+					if (err) {
+						throw err
+					}
+				}
+			)
+		} catch (err) {
+			throw err
 		}
 	}
 }

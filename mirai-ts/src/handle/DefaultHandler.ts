@@ -5,6 +5,7 @@ import { MessageType } from 'mirai-ts'
 export abstract class DefaultHandler implements DefaultHandlerType {
 	handler: true
 	log: Logger
+	
 	constructor() {
 		this.handler = true
 		this.log = new Logger()

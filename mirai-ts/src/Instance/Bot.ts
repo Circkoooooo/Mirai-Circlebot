@@ -1,6 +1,5 @@
 import { Mirai, MiraiApiHttpSetting, MiraiInstance } from 'mirai-ts'
 import { User } from '../../types/User'
-import { DefaultHandler } from '../handle/DefaultHandler'
 import { CircleBot } from '../../types'
 import { HandlerList, OtherUse } from '../../types/UseType'
 import yaml from 'js-yaml'
