@@ -1,22 +1,9 @@
-import fs from 'fs'
-import path from 'path'
-import yaml from 'js-yaml'
-import type { MiraiApiHttpSetting } from 'mirai-ts'
+import { user } from './config/Login'
+import { ReplyHandler } from './src/handle/ReplyHandler'
 import { Bot } from './src/Instance/Bot'
-// setting 可直接读取 setting.yml 或参考 `src/types/setting.ts`
-const setting = yaml.load(
-	fs.readFileSync(
-		path.resolve(
-			__dirname,
-			'../mcl/config/net.mamoe.mirai-api-http/setting.yml'
-		),
-		'utf8'
-	)
-) as MiraiApiHttpSetting
+import { OtherUse } from './types/UseType'
 
-// const user = {
-// 	qq: LoginConfig.qq,
-// } as User
-
-const bot = new Bot({ qq: 1054081929 }, setting)
-// bot.start()
+const bot = new Bot(user)
+bot.use(new ReplyHandler())
+bot.use({ is: 'string' } as OtherUse)
+bot.start()

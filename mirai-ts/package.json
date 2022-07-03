@@ -1,5 +1,6 @@
 {
 	"dependencies": {
+		"cross-env": "^7.0.3",
 		"js-yaml": "^4.1.0",
 		"mirai-ts": "^2.2.1",
 		"nodemon": "^2.0.18",
@@ -10,7 +11,7 @@
 	"version": "1.0.0",
 	"main": "index.ts",
 	"scripts": {
-		"dev": "nodemon",
+		"dev": "cross-env NODE_ENV=development nodemon",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"author": "",
