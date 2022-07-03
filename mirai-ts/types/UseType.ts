@@ -1,7 +1,7 @@
-import { ReplyHandlerType } from './HandlerType'
+import { DefaultHandlerType } from './HandlerType'
 
 // 用于管理可用类型的HandlerList
-export type HandlerList = ReplyHandlerType
+export type HandlerList = DefaultHandlerType
 
 /**
  * 其他的use类型

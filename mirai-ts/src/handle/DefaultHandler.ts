@@ -1,23 +1,18 @@
-import Mirai from 'mirai-ts'
+import Mirai, { Logger } from 'mirai-ts'
 import { DefaultHandlerType } from '../../types/HandlerType'
 import { MessageType } from 'mirai-ts'
 
 export abstract class DefaultHandler implements DefaultHandlerType {
 	handler: true
-	mirai: Mirai | null
-
+	log: Logger
 	constructor() {
-		this.mirai = null
 		this.handler = true
+		this.log = new Logger()
 	}
-	bind(miraiInstance: Mirai) {
-		this.mirai = miraiInstance
+	abstract watchChatMessage(msg: MessageType.ChatMessage): void
+	abstract replyChatMessage(msg: MessageType.ChatMessage): void
+
+	isOfType<T>(use: any, propertyToCheckFor: keyof T): use is T {
+		return (use as T)[propertyToCheckFor] !== undefined
 	}
-	start() {
-		this.mirai?.on('message', msg => {
-			console.log(msg)
-		})
-		this.mirai?.listen()
-	}
-	abstract watch(msg: MessageType.ChatMessage): void
 }
