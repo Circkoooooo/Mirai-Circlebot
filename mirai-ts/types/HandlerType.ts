@@ -11,6 +11,8 @@ export type DefaultHandlerType = {
 export interface ReplyHandlerType extends DefaultHandlerType {
 	groupWhiteList: Array<number>
 	friendWhiteList: Array<number>
+	loadMod: () => void
+	validateWhiteList: (msg: MessageType.ChatMessage) => boolean
 }
 /**
  * 暴露出来用于mod
@@ -19,7 +21,6 @@ export type ReplyModType = {
 	readonly replyHandler: true
 	name: string
 	keywords: string[]
-	test: () => void
 	reply: (
 		msg: MessageType.MessageChain | string
 	) => MessageType.MessageChain | string

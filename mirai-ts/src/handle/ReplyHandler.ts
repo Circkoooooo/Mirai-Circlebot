@@ -24,7 +24,13 @@ export class ReplyHandler extends DefaultHandler {
 	 * @param msg
 	 */
 	watchChatMessage(msg: MessageType.ChatMessage): void {
-		// 这里需要执行的逻辑有：提取命令文本，通过mod处理文本，..
+		// 这里需要执行的逻辑有：白名单拦截，提取命令文本，通过mod处理文本，..
+		if (!this.validateWhiteList(msg)) {
+			this.log.info('非白名单' + this.msgLog(msg))
+			return
+		}
+		this.log.info(this.msgLog(msg))
+
 		this.mods.forEach(mod => {
 			this.replyChatMessage(msg, mod.reply(msg.plain))
 		})
@@ -35,7 +41,9 @@ export class ReplyHandler extends DefaultHandler {
 	): void {
 		msg.reply(sendMsg)
 	}
-
+	/**
+	 * 加载mod
+	 */
 	loadMod() {
 		for (const [_, obj] of Object.entries(replyModList)) {
 			const mod = obj()
@@ -57,28 +65,15 @@ export class ReplyHandler extends DefaultHandler {
 	/**
 	 * 验证白名单
 	 */
-	validateWhiteList(msg: MessageType.ChatMessage) {
-		const type = this.getMsgType(msg)
+	validateWhiteList(msg: MessageType.ChatMessage): boolean {
+		const type = msg.type
 		switch (type) {
 			case 'GroupMessage':
-				console.log('group')
-				break
+				return this.groupWhiteList.includes(msg.sender.group.id)
 			case 'FriendMessage':
-				console.log('friend')
-				break
+				return this.friendWhiteList.includes(msg.sender.id)
 			case 'TempMessage':
-				console.log('temp')
-				break
+				return false
 		}
-	}
-	/**
-	 * 得到消息类型
-	 * @param msg
-	 * @returns
-	 */
-	getMsgType(
-		msg: MessageType.ChatMessage
-	): 'GroupMessage' | 'TempMessage' | 'FriendMessage' {
-		return msg.type
 	}
 }
