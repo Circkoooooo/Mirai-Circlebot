@@ -1,4 +1,4 @@
-import { Logger, MessageType } from 'mirai-ts'
+import { MessageType } from 'mirai-ts'
 import { ReplyConfigType } from '../../types/ReplyConfigType'
 import { DefaultHandler } from './DefaultHandler'
 import * as replyModList from '../mods/ReplyHandler'
@@ -19,10 +19,22 @@ export class ReplyHandler extends DefaultHandler {
 		this.mods = []
 		this.loadMod()
 	}
+	/**
+	 * 监听ChatMessage消息，然后从这里开始处理
+	 * @param msg
+	 */
 	watchChatMessage(msg: MessageType.ChatMessage): void {
-		console.log(this.mods)
+		// 这里需要执行的逻辑有：提取命令文本，通过mod处理文本，..
+		this.mods.forEach(mod => {
+			this.replyChatMessage(msg, mod.reply(msg.plain))
+		})
 	}
-	replyChatMessage(msg: MessageType.ChatMessage): void {}
+	replyChatMessage(
+		msg: MessageType.ChatMessage,
+		sendMsg: MessageType.MessageChain | string
+	): void {
+		msg.reply(sendMsg)
+	}
 
 	loadMod() {
 		for (const [_, obj] of Object.entries(replyModList)) {
