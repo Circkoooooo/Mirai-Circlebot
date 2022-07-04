@@ -5,7 +5,7 @@ import { MessageType } from 'mirai-ts'
 export abstract class DefaultHandler implements DefaultHandlerType {
 	handler: true
 	log: Logger
-	
+
 	constructor() {
 		this.handler = true
 		this.log = new Logger()
@@ -19,6 +19,11 @@ export abstract class DefaultHandler implements DefaultHandlerType {
 	isOfType<T>(use: any, propertyToCheckFor: keyof T): use is T {
 		return (use as T)[propertyToCheckFor] !== undefined
 	}
+	/**
+	 * 打印 接收到的信息
+	 * @param msg
+	 * @returns
+	 */
 	msgLog(msg: MessageType.ChatMessage) {
 		const type = msg.type
 		const formatMsgChain = (msgChain: MessageType.MessageChain) => {
@@ -29,12 +34,12 @@ export abstract class DefaultHandler implements DefaultHandlerType {
 		}
 		switch (type) {
 			case 'FriendMessage':
-				return `[好友：${msg.sender.nickname}]：${msg.plain}。${formatMsgChain(
+				return `[好友：${msg.sender.nickname}]：${msg.plain} ${formatMsgChain(
 					msg.messageChain
 				)}`
 
 			case 'GroupMessage':
-				return `[群：${msg.sender.group.id}]：${msg.plain}。${formatMsgChain(
+				return `[群：${msg.sender.group.id}]：${msg.plain} ${formatMsgChain(
 					msg.messageChain
 				)}`
 			case 'TempMessage':

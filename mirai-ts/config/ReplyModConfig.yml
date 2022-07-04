@@ -1,6 +1,9 @@
 Reply:
   name: 简单回复
   keywords: []
+  whiteList: []
 Test:
   name: 测试
   keywords: []
+  whiteList:
+    - 159426420

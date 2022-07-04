@@ -2,7 +2,7 @@ import { MessageType } from 'mirai-ts'
 import { ReplyConfigType } from '../../types/ReplyConfigType'
 import { DefaultHandler } from './DefaultHandler'
 import * as replyModList from '../mods/ReplyHandler'
-import { ReplyModType } from '../../types/HandlerType'
+import { ReplyModConfigType, ReplyModType } from '../../types/HandlerType'
 import fs from 'fs'
 import path from 'path'
 import yaml from 'js-yaml'
@@ -34,6 +34,9 @@ export class ReplyHandler extends DefaultHandler {
 		this.log.info(this.msgLog(msg))
 
 		for (const [key, obj] of Object.entries(this.mods)) {
+			if (!this.filterWhiteList(obj, msg)) {
+				continue
+			}
 			this.replyChatMessage(msg, obj.reply(msg.plain))
 		}
 	}
@@ -41,7 +44,9 @@ export class ReplyHandler extends DefaultHandler {
 		msg: MessageType.ChatMessage,
 		sendMsg: MessageType.MessageChain | string
 	): void {
-		msg.reply(sendMsg)
+		msg.reply(sendMsg).then(item => {
+			this.log.info(`我回复->${sendMsg}`)
+		})
 	}
 	/**
 	 * 加载mod
@@ -79,30 +84,85 @@ export class ReplyHandler extends DefaultHandler {
 				return false
 		}
 	}
-	createConfigFile() {
-		const configTemplate: {
-			[key: string]: { name: string; keywords: string[] }
-		} = {}
-		for (const [key, obj] of Object.entries(this.mods)) {
-			configTemplate[key] = {
-				name: obj.name,
-				keywords: obj.keywords,
-			}
-		}
+	/**
+	 * 生成配置文档
+	 */
+	async createConfigFile() {
 		try {
-			let configContent = yaml.dump(configTemplate)
-			fs.writeFile(
-				path.resolve(__dirname, '../../config/ReplyModConfig.yml'),
-				configContent,
-				'utf-8',
-				err => {
-					if (err) {
-						throw err
-					}
-				}
+			const targetPath = path.resolve(
+				__dirname,
+				'../../config/ReplyModConfig.yml'
 			)
+
+			//读取原有配置
+			const exist = fs.existsSync(targetPath)
+			let originConfig: ReplyModConfigType = {} as ReplyModConfigType
+			if (exist) {
+				originConfig = yaml.load(
+					await fs.promises.readFile(targetPath, 'utf-8')
+				) as ReplyModConfigType
+			} else {
+				this.log.info('首次创建，完成后可根据配置文件修改相应配置。')
+			}
+
+			// 合并配置
+			const configTemplate: ReplyModConfigType = {} as ReplyModConfigType
+
+			for (const [key, obj] of Object.entries(this.mods)) {
+				// 配置写入的模板
+				configTemplate[key] = {
+					name: obj.name,
+					keywords: obj.keywords,
+					whiteList:
+						originConfig[key]?.whiteList === undefined
+							? []
+							: originConfig[key].whiteList,
+				}
+			}
+
+			let configContent = yaml.dump(configTemplate)
+			// 写入配置
+			fs.writeFile(targetPath, configContent, 'utf-8', err => {
+				if (err) {
+					throw err
+				}
+			})
+
+			this.log.success('命令配置文件创建完成')
+			this.loadWhiteList(configTemplate)
 		} catch (err) {
 			throw err
+		}
+	}
+	/**
+	 * 给现有的mod加载白名单
+	 */
+	loadWhiteList(configTemplate: ReplyModConfigType) {
+		this.log.info('正在加载命令白名单列表')
+		for (const [key, obj] of Object.entries(this.mods)) {
+			obj.whiteList = configTemplate[key].whiteList
+		}
+		this.log.success('命令白名单列表加载成功')
+	}
+	/**
+	 * 过滤信息。根据白名单列表
+	 */
+	filterWhiteList(modInstance: ReplyModType, msg: MessageType.ChatMessage) {
+		const type = msg.type
+		let number
+
+		switch (type) {
+			case 'FriendMessage':
+				number = msg.sender.id
+				break
+			case 'GroupMessage':
+				number = msg.sender.group.id
+				break
+		}
+		if (number === undefined) {
+			return false
+		} else {
+			return modInstance.whiteList.includes(number)
 		}
 	}
 }
