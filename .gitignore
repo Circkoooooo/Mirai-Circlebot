@@ -4,3 +4,5 @@ logs
 mcl_dev
 node_modules
 dist
+configs
+*.self.ts

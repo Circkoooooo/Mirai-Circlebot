@@ -9,7 +9,7 @@ export type ReplyWhiteListType = {
 export type ReplyModConfigType = {
 	[key: string]: {
 		name: string
-		isAlwasReply?: boolean
+		isAlwaysReply?: boolean
 		keywords?: string[]
 		keywordRule?: string[] //正则表达式
 		whiteList?: number[]

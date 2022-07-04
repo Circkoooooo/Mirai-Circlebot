@@ -42,7 +42,10 @@ export default class Bot implements CircleBot {
 	 */
 	constructor(qq: number) {
 		this.log = new Logger()
-		this.configtPath = path.resolve('config/BotConfig')
+		if (!fs.existsSync(path.resolve('configs'))) {
+			fs.mkdirSync(path.resolve('configs'))
+		}
+		this.configtPath = path.resolve('configs/BotConfig')
 		const settingConfig = resolveApiHttpConfig()
 		this.setting = settingConfig as MiraiApiHttpSetting
 		this.qq = qq

@@ -19,8 +19,8 @@ export class ReplyHandler extends DefaultHandler {
 	mods: { [key: string]: ReplyModType }
 	constructor() {
 		super()
-		this._modConfigPath = path.resolve('config/ReplyModConfig.yml')
-		this._whiteListPath = path.resolve('config/ReplyWhiteList.yml')
+		this._modConfigPath = path.resolve('configs/ReplyModConfig.yml')
+		this._whiteListPath = path.resolve('configs/ReplyWhiteList.yml')
 		this.handler = true
 		this.groupWhiteList = []
 		this.friendWhiteList = []
@@ -167,6 +167,12 @@ export class ReplyHandler extends DefaultHandler {
 				// 配置写入的模板
 				configTemplate[key] = {
 					name: obj.name,
+					isAlwaysReply:
+						originConfig[key] && originConfig[key].isAlwaysReply
+							? originConfig[key].isAlwaysReply
+							: obj.isAlwaysReply === false
+							? false
+							: undefined,
 					keywords:
 						originConfig[key] && originConfig[key].keywords
 							? originConfig[key].keywords
