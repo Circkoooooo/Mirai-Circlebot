@@ -1,4 +1,4 @@
-import { Mirai, MiraiApiHttpSetting, MiraiInstance } from 'mirai-ts'
+import { Logger, Mirai, MiraiApiHttpSetting, MiraiInstance } from 'mirai-ts'
 import { User } from '../../types/User'
 import { CircleBot } from '../../types'
 import { HandlerList, OtherUse } from '../../types/UseType'
@@ -92,16 +92,23 @@ function isOfType<T>(use: any, propertyToCheckFor: keyof T): use is T {
 export const resolveApiHttpConfig = (isDev: boolean) => {
 	let filePath = ''
 	if (!isDev) {
-		filePath = '../mcl/config/net.mamoe.mirai-api-http/setting.yml'
+		filePath = path.resolve(
+			'../mcl/config/net.mamoe.mirai-api-http/setting.yml'
+		)
 	} else {
-		filePath = '../mcl_dev/config/net.mamoe.mirai-api-http/setting.yml'
+		filePath = path.resolve(
+			'../mcl/config/net.mamoe.mirai-api-http/setting.yml'
+		)
 	}
 	try {
 		const setting = yaml.load(
-			fs.readFileSync(path.resolve(filePath), 'utf8')
+			fs.readFileSync(filePath, 'utf8')
 		) as MiraiApiHttpSetting
 		return setting
 	} catch (err) {
-		throw new Error('请检查' + path.resolve(filePath) + '是否已经正确配置')
+		new Logger().error(
+			'请将项目文件夹放在和mcl相同的根目录下，以读取mcl中的config配置'
+		)
+		return
 	}
 }

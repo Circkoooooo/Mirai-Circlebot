@@ -19,14 +19,8 @@ export class ReplyHandler extends DefaultHandler {
 	mods: { [key: string]: ReplyModType }
 	constructor() {
 		super()
-		this._modConfigPath = path.resolve(
-			__dirname,
-			'../../config/ReplyModConfig.yml'
-		)
-		this._whiteListPath = path.resolve(
-			__dirname,
-			'../../config/ReplyWhiteList.yml'
-		)
+		this._modConfigPath = path.resolve('config/ReplyModConfig.yml')
+		this._whiteListPath = path.resolve('config/ReplyWhiteList.yml')
 		this.handler = true
 		this.groupWhiteList = []
 		this.friendWhiteList = []

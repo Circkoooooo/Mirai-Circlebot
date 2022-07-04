@@ -1,4 +1,4 @@
-import Mirai, { Logger } from 'mirai-ts'
+import  { Logger } from 'mirai-ts'
 import { DefaultHandlerType } from '../../types/HandlerType'
 import { MessageType } from 'mirai-ts'
 
