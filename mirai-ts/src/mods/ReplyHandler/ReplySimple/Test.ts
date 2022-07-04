@@ -3,6 +3,7 @@ import { ReplyModType } from '../../../../types/HandlerType'
 
 export const Test = (): ReplyModType => {
 	const name = '测试'
+	const isAlwaysReply: boolean = false
 	const keywords: string[] = []
 	const keywordRule: RegExp[] = []
 	const whiteList: number[] = []
@@ -16,6 +17,7 @@ export const Test = (): ReplyModType => {
 		whiteList,
 		replyHandler: true,
 		reply,
+		isAlwaysReply,
 		keywordRule,
 	}
 }

@@ -1,7 +1,17 @@
-import { ReplyModType } from './HandlerType'
-
-export type ReplyConfigType = {
+export type ReplyWhiteListType = {
 	groupWhiteList: Array<number>
 	friendWhiteList: Array<number>
-	mods: Array<ReplyModType>
+}
+
+/**
+ * mod配置模板
+ */
+export type ReplyModConfigType = {
+	[key: string]: {
+		name: string
+		isAlwasReply?: boolean
+		keywords?: string[]
+		keywordRule?: string[] //正则表达式
+		whiteList?: number[]
+	}
 }

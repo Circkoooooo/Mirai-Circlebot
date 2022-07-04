@@ -9,5 +9,4 @@ Test:
     - 你好
   whiteList:
     - 159426420
-  keywordRule:
-    - '[0-9]-[a-z]'
+  keywordRule: []

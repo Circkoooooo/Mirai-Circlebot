@@ -1,23 +1,37 @@
-import { MessageType } from 'mirai-ts'
-import { ReplyConfigType } from '../../types/ReplyConfigType'
+import { MessageType, template } from 'mirai-ts'
 import { DefaultHandler } from './DefaultHandler'
 import * as replyModList from '../mods/ReplyHandler'
-import { ReplyModConfigType, ReplyModType } from '../../types/HandlerType'
+import { ReplyModType } from '../../types/HandlerType'
 import fs from 'fs'
 import path from 'path'
 import yaml from 'js-yaml'
+import {
+	ReplyModConfigType,
+	ReplyWhiteListType,
+} from '../../types/ReplyConfigType'
+
 export class ReplyHandler extends DefaultHandler {
 	handler: true
+	_modConfigPath: string
+	_whiteListPath: string
 	groupWhiteList: Array<number>
 	friendWhiteList: Array<number>
 	mods: { [key: string]: ReplyModType }
-	constructor(replyConfig: ReplyConfigType) {
+	constructor() {
 		super()
+		this._modConfigPath = path.resolve(
+			__dirname,
+			'../../config/ReplyModConfig.yml'
+		)
+		this._whiteListPath = path.resolve(
+			__dirname,
+			'../../config/ReplyWhiteList.yml'
+		)
 		this.handler = true
-		const { groupWhiteList, friendWhiteList } = replyConfig
-		this.groupWhiteList = groupWhiteList
-		this.friendWhiteList = friendWhiteList
+		this.groupWhiteList = []
+		this.friendWhiteList = []
 		this.mods = {}
+		this.loadHandlerWhiteList()
 		this.loadMod()
 		this.createConfigFile()
 	}
@@ -50,6 +64,51 @@ export class ReplyHandler extends DefaultHandler {
 		msg.reply(sendMsg).then(item => {
 			this.log.info(`我回复->${sendMsg}`)
 		})
+	}
+	async loadHandlerWhiteList() {
+		this.log.info('正在加载处理器白名单列表')
+		const exist = fs.existsSync(this._whiteListPath)
+		try {
+			const whiteListTemplate: ReplyWhiteListType = {
+				groupWhiteList: [],
+				friendWhiteList: [],
+			}
+			const whiteList = yaml.dump(whiteListTemplate)
+			if (!exist) {
+				fs.writeFile(this._whiteListPath, whiteList, 'utf-8', err => {
+					if (err) {
+						throw err
+					}
+				})
+			} else {
+				const res = await fs.promises.readFile(this._whiteListPath, 'utf-8')
+				const originWhiteList = yaml.load(res) as ReplyWhiteListType
+				const { groupWhiteList, friendWhiteList } =
+					originWhiteList === undefined
+						? ({} as ReplyWhiteListType)
+						: originWhiteList
+
+				const writeListTemplate: ReplyWhiteListType = {
+					groupWhiteList: groupWhiteList === undefined ? [] : groupWhiteList,
+					friendWhiteList: friendWhiteList === undefined ? [] : friendWhiteList,
+				}
+				fs.writeFile(
+					this._whiteListPath,
+					yaml.dump(writeListTemplate),
+					'utf-8',
+					err => {
+						if (err) {
+							throw err
+						}
+					}
+				)
+				this.friendWhiteList = writeListTemplate.friendWhiteList
+				this.groupWhiteList = writeListTemplate.groupWhiteList
+			}
+		} catch (err) {
+			throw new Error('处理器白名单列表加载失败')
+		}
+		this.log.success('处理器白名单列表加载成功')
 	}
 	/**
 	 * 加载mod
@@ -92,20 +151,19 @@ export class ReplyHandler extends DefaultHandler {
 	 */
 	async createConfigFile() {
 		try {
-			const targetPath = path.resolve(
-				__dirname,
-				'../../config/ReplyModConfig.yml'
-			)
-
 			//读取原有配置
-			const exist = fs.existsSync(targetPath)
+			const exist = fs.existsSync(this._modConfigPath)
 			let originConfig: ReplyModConfigType = {} as ReplyModConfigType
+			let config: ReplyModConfigType = {} as ReplyModConfigType
 			if (exist) {
-				originConfig = yaml.load(
-					await fs.promises.readFile(targetPath, 'utf-8')
+				config = yaml.load(
+					await fs.promises.readFile(this._modConfigPath, 'utf-8')
 				) as ReplyModConfigType
 			} else {
 				this.log.info('首次创建，完成后可根据配置文件修改相应配置。')
+			}
+			if (config !== undefined) {
+				originConfig = config
 			}
 
 			// 合并配置
@@ -116,23 +174,23 @@ export class ReplyHandler extends DefaultHandler {
 				configTemplate[key] = {
 					name: obj.name,
 					keywords:
-						originConfig[key]?.keywords === undefined
-							? []
-							: originConfig[key].keywords,
+						originConfig[key] && originConfig[key].keywords
+							? originConfig[key].keywords
+							: [],
 					whiteList:
-						originConfig[key]?.whiteList === undefined
-							? []
-							: originConfig[key].whiteList,
+						originConfig[key] && originConfig[key].whiteList
+							? originConfig[key].whiteList
+							: [],
 					keywordRule:
-						originConfig[key]?.keywordRule === undefined
-							? []
-							: originConfig[key].keywordRule,
+						originConfig[key] && originConfig[key].keywordRule
+							? originConfig[key].keywordRule
+							: [],
 				}
 			}
 
-			let configContent = yaml.dump(configTemplate)
+			const configContent = yaml.dump(configTemplate)
 			// 写入配置
-			fs.writeFile(targetPath, configContent, 'utf-8', err => {
+			fs.writeFile(this._modConfigPath, configContent, 'utf-8', err => {
 				if (err) {
 					throw err
 				}
@@ -142,7 +200,7 @@ export class ReplyHandler extends DefaultHandler {
 			this.loadWhiteList(configTemplate)
 			this.loadKeywordConfig(configTemplate)
 		} catch (err) {
-			throw err
+			throw new Error('配置文档生成失败')
 		}
 	}
 	/**
@@ -151,17 +209,27 @@ export class ReplyHandler extends DefaultHandler {
 	loadWhiteList(configTemplate: ReplyModConfigType) {
 		this.log.info('正在加载命令白名单列表')
 		for (const [key, obj] of Object.entries(this.mods)) {
-			obj.whiteList = configTemplate[key].whiteList
+			const config = configTemplate[key]
+			if (config.whiteList !== undefined) {
+				obj.whiteList = config.whiteList
+			}
 		}
+
 		this.log.success('命令白名单列表加载成功')
 	}
+
 	loadKeywordConfig(configTemplate: ReplyModConfigType) {
 		this.log.info('正在加载关键词配置')
 		for (const [key, obj] of Object.entries(this.mods)) {
-			obj.keywords = configTemplate[key].keywords
-			obj.keywordRule = configTemplate[key].keywordRule?.map(regList => {
-				return new RegExp(regList, 'g')
-			})
+			const config = configTemplate[key]
+			if (config.keywords !== undefined) {
+				obj.keywords = config.keywords
+			}
+			if (config.keywordRule !== undefined) {
+				obj.keywordRule = config.keywordRule.map(regList => {
+					return new RegExp(regList, 'g')
+				})
+			}
 		}
 		this.log.success('关键词配置加载成功')
 	}

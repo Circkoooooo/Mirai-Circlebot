@@ -1,6 +1,7 @@
 import { Logger, MessageType } from 'mirai-ts'
 export type DefaultHandlerType = {
 	readonly handler: true
+	_targetPath?: string
 	log: Logger
 	watchChatMessage: (msg: MessageType.ChatMessage) => void
 	replyChatMessage: (
@@ -22,21 +23,11 @@ export interface ReplyHandlerType extends DefaultHandlerType {
 export interface ReplyModType {
 	readonly replyHandler: true
 	name: string
+	isAlwaysReply?: boolean
 	keywords: string[]
 	keywordRule?: RegExp[]
 	whiteList: number[]
 	reply: (
 		msg: MessageType.MessageChain | string
 	) => MessageType.MessageChain | string
-}
-/**
- * mod配置模板
- */
-export type ReplyModConfigType = {
-	[key: string]: {
-		name: string
-		keywords: string[]
-		whiteList: number[]
-		keywordRule?: string[] //正则表达式
-	}
 }
