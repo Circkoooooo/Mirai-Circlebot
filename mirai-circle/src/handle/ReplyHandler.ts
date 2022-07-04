@@ -1,14 +1,14 @@
-import { MessageType, template } from 'mirai-ts'
+import { MessageType } from 'mirai-ts'
 import { DefaultHandler } from './DefaultHandler'
 import * as replyModList from '../mods/ReplyHandler'
-import { ReplyModType } from '../../types/HandlerType'
-import fs from 'fs'
-import path from 'path'
-import yaml from 'js-yaml'
+import { ReplyModType } from '../types/HandlerType'
+import * as fs from 'fs'
+import * as path from 'path'
+import * as yaml from 'js-yaml'
 import {
 	ReplyModConfigType,
 	ReplyWhiteListType,
-} from '../../types/ReplyConfigType'
+} from '../types/ReplyConfigType'
 
 export class ReplyHandler extends DefaultHandler {
 	handler: true
@@ -40,22 +40,22 @@ export class ReplyHandler extends DefaultHandler {
 			return
 		}
 		this.log.info(this.msgLog(msg))
-		for (const [key, obj] of Object.entries(this.mods)) {
-			if (!this.filterWhiteList(obj, msg)) {
+		for (const item of Object.entries(this.mods)) {
+			if (!this.filterWhiteList(item[1], msg)) {
 				continue
 			}
 			//拦截关键词
-			if (!this.filterKeywordList(obj, msg)) {
+			if (!this.filterKeywordList(item[1], msg)) {
 				continue
 			}
-			this.replyChatMessage(msg, obj.reply(msg.plain))
+			this.replyChatMessage(msg, item[1].reply(msg.plain))
 		}
 	}
 	replyChatMessage(
 		msg: MessageType.ChatMessage,
 		sendMsg: MessageType.MessageChain | string
 	): void {
-		msg.reply(sendMsg).then(item => {
+		msg.reply(sendMsg).then(() => {
 			this.log.info(`我回复->${sendMsg}`)
 		})
 	}

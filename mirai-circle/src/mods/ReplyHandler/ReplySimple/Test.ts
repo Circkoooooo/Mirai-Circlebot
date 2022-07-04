@@ -1,5 +1,5 @@
 import { MessageType } from 'mirai-ts'
-import { ReplyModType } from '../../../../types/HandlerType'
+import { ReplyModType } from '../../../types/HandlerType'
 
 export const Test = (): ReplyModType => {
 	const name = '测试'

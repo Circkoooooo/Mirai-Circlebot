@@ -21,7 +21,7 @@ Mirai-Generator
 
 现在，你已经启动了Mirai并配置好了mirai-http。
 
-接下来关于机器人的功能由mirai-ts来完成。
+接下来关于机器人的功能由mirai-circle来完成。
 
 ### 版本
 * [Mcl](https://github.com/iTXTech/mirai-console-loader/releases/tag/v1.2.2)

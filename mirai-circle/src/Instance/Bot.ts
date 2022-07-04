@@ -1,13 +1,12 @@
 import { Logger, Mirai, MiraiApiHttpSetting, MiraiInstance } from 'mirai-ts'
-import { User } from '../../types/User'
-import { CircleBot } from '../../types'
-import { HandlerList, OtherUse } from '../../types/UseType'
-import yaml from 'js-yaml'
-import fs from 'fs'
-import path from 'path'
-import { ReplyHandlerType } from '../../types/HandlerType'
+import { CircleBot } from '../types/Bot'
+import { HandlerList, OtherUse } from '../types/UseType'
+import * as yaml from 'js-yaml'
+import * as fs from 'fs'
+import * as path from 'path'
+import { ReplyHandlerType } from '../types/HandlerType'
 
-export class Bot implements CircleBot {
+export default class Bot implements CircleBot {
 	/**
 	 * 用户
 	 */
@@ -89,7 +88,7 @@ function isOfType<T>(use: any, propertyToCheckFor: keyof T): use is T {
  * 处理setting路径
  * @returns
  */
-export const resolveApiHttpConfig = () => {
+const resolveApiHttpConfig = () => {
 	let filePath = ''
 	filePath = path.resolve('../mcl/config/net.mamoe.mirai-api-http/setting.yml')
 

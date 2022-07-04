@@ -7,6 +7,5 @@ Test:
   name: 测试
   keywords:
     - 你好
-  whiteList:
-    - 159426420
+  whiteList: []
   keywordRule: []
