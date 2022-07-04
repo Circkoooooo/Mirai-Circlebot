@@ -11,7 +11,7 @@ export class Bot implements CircleBot {
 	/**
 	 * 用户
 	 */
-	user: User
+	qq: number
 	/**
 	 * Mirai实例
 	 */
@@ -29,24 +29,25 @@ export class Bot implements CircleBot {
 	 */
 	OtherUse: Array<OtherUse>
 	/**
-	 * 开发模式
+	 * 配置文件的目录
 	 */
-	isDev: boolean
+	configtPath: string
 
+	/**
+	 * log
+	 */
+	log: Logger
 	/**
 	 * user
 	 * httpsetting
-	 * @param userConfig
 	 */
-	constructor(userConfig: User) {
-		const env: 'development' | 'production' = process.env.NODE_ENV as
-			| 'development'
-			| 'production'
-		env === 'production' ? (this.isDev = false) : (this.isDev = true)
-		const settingConfig = resolveApiHttpConfig(this.isDev)
+	constructor(qq: number) {
+		this.log = new Logger()
+		this.configtPath = path.resolve('config/BotConfig')
+		const settingConfig = resolveApiHttpConfig()
 		this.setting = settingConfig as MiraiApiHttpSetting
+		this.qq = qq
 
-		this.user = userConfig
 		this.mirai = new Mirai(settingConfig)
 		this.OtherUse = []
 		this.handlerList = []
@@ -65,7 +66,7 @@ export class Bot implements CircleBot {
 	}
 
 	start() {
-		this.mirai?.link(this.user.qq)
+		this.mirai?.link(this.qq)
 		this.mirai?.on('message', msg => {
 			this.handlerList.forEach(item => {
 				item.watchChatMessage(msg)
@@ -86,20 +87,12 @@ function isOfType<T>(use: any, propertyToCheckFor: keyof T): use is T {
 }
 /**
  * 处理setting路径
- * @param isDev
  * @returns
  */
-export const resolveApiHttpConfig = (isDev: boolean) => {
+export const resolveApiHttpConfig = () => {
 	let filePath = ''
-	if (!isDev) {
-		filePath = path.resolve(
-			'../mcl/config/net.mamoe.mirai-api-http/setting.yml'
-		)
-	} else {
-		filePath = path.resolve(
-			'../mcl/config/net.mamoe.mirai-api-http/setting.yml'
-		)
-	}
+	filePath = path.resolve('../mcl/config/net.mamoe.mirai-api-http/setting.yml')
+
 	try {
 		const setting = yaml.load(
 			fs.readFileSync(filePath, 'utf8')
