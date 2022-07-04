@@ -32,9 +32,12 @@ export class ReplyHandler extends DefaultHandler {
 			return
 		}
 		this.log.info(this.msgLog(msg))
-
 		for (const [key, obj] of Object.entries(this.mods)) {
 			if (!this.filterWhiteList(obj, msg)) {
+				continue
+			}
+			//拦截关键词
+			if (!this.filterKeywordList(obj, msg)) {
 				continue
 			}
 			this.replyChatMessage(msg, obj.reply(msg.plain))
@@ -112,11 +115,18 @@ export class ReplyHandler extends DefaultHandler {
 				// 配置写入的模板
 				configTemplate[key] = {
 					name: obj.name,
-					keywords: obj.keywords,
+					keywords:
+						originConfig[key]?.keywords === undefined
+							? []
+							: originConfig[key].keywords,
 					whiteList:
 						originConfig[key]?.whiteList === undefined
 							? []
 							: originConfig[key].whiteList,
+					keywordRule:
+						originConfig[key]?.keywordRule === undefined
+							? []
+							: originConfig[key].keywordRule,
 				}
 			}
 
@@ -130,6 +140,7 @@ export class ReplyHandler extends DefaultHandler {
 
 			this.log.success('命令配置文件创建完成')
 			this.loadWhiteList(configTemplate)
+			this.loadKeywordConfig(configTemplate)
 		} catch (err) {
 			throw err
 		}
@@ -143,6 +154,16 @@ export class ReplyHandler extends DefaultHandler {
 			obj.whiteList = configTemplate[key].whiteList
 		}
 		this.log.success('命令白名单列表加载成功')
+	}
+	loadKeywordConfig(configTemplate: ReplyModConfigType) {
+		this.log.info('正在加载关键词配置')
+		for (const [key, obj] of Object.entries(this.mods)) {
+			obj.keywords = configTemplate[key].keywords
+			obj.keywordRule = configTemplate[key].keywordRule?.map(regList => {
+				return new RegExp(regList, 'g')
+			})
+		}
+		this.log.success('关键词配置加载成功')
 	}
 	/**
 	 * 过滤信息。根据白名单列表
@@ -164,5 +185,18 @@ export class ReplyHandler extends DefaultHandler {
 		} else {
 			return modInstance.whiteList.includes(number)
 		}
+	}
+	filterKeywordList(modInstance: ReplyModType, msg: MessageType.ChatMessage) {
+		let isKeyword = []
+		// 判断是否有keywordRule
+		if (modInstance.keywordRule !== undefined) {
+			isKeyword.push(
+				modInstance.keywordRule.some(reg => {
+					return reg.test(msg.plain)
+				})
+			)
+		}
+		isKeyword.push(modInstance.keywords.includes(msg.plain))
+		return isKeyword.includes(true)
 	}
 }

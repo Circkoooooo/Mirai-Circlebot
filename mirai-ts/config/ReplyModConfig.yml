@@ -2,8 +2,12 @@ Reply:
   name: 简单回复
   keywords: []
   whiteList: []
+  keywordRule: []
 Test:
   name: 测试
-  keywords: []
+  keywords:
+    - 你好
   whiteList:
     - 159426420
+  keywordRule:
+    - '[0-9]-[a-z]'

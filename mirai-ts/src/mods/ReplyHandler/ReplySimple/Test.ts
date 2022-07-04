@@ -4,6 +4,7 @@ import { ReplyModType } from '../../../../types/HandlerType'
 export const Test = (): ReplyModType => {
 	const name = '测试'
 	const keywords: string[] = []
+	const keywordRule: RegExp[] = []
 	const whiteList: number[] = []
 
 	const reply = (msg: MessageType.MessageChain | string) => {
@@ -15,5 +16,6 @@ export const Test = (): ReplyModType => {
 		whiteList,
 		replyHandler: true,
 		reply,
+		keywordRule,
 	}
 }

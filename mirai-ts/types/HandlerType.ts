@@ -23,6 +23,7 @@ export interface ReplyModType {
 	readonly replyHandler: true
 	name: string
 	keywords: string[]
+	keywordRule?: RegExp[]
 	whiteList: number[]
 	reply: (
 		msg: MessageType.MessageChain | string
@@ -36,5 +37,6 @@ export type ReplyModConfigType = {
 		name: string
 		keywords: string[]
 		whiteList: number[]
+		keywordRule?: string[] //正则表达式
 	}
 }
