@@ -120,7 +120,6 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 			const modsDir = fs.existsSync(
 				path.resolve(path.resolve(process.cwd(), 'src/mods'))
 			)
-			console.log(modsDir)
 			if (!modsDir) {
 				fs.promises.mkdir(path.resolve(process.cwd(), 'src/mods'))
 			}
@@ -323,7 +322,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 
 const template = `
 import { MessageType } from 'mirai-ts'
-import { ReplyModType } from 'mirai-circle'
+import { ReplyModType } from 'mirai-circlebot'
 
 export const Reply = (): ReplyModType => {
 	const name = '测试'
