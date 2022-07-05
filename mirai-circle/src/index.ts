@@ -1,3 +1,4 @@
+import { ReplyHandler } from './handle'
 import { CircleBot } from './Instance/Bot'
 
 // 机器人
@@ -8,3 +9,4 @@ export { ReplyHandlerType } from './types/HandlerType'
 export { ReplyModType } from './types/ModType'
 // 处理器
 export * from './handle'
+

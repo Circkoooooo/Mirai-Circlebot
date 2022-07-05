@@ -1,7 +1,7 @@
 import { MessageType } from 'mirai-ts'
-import { ReplyModType } from '../../../types/ModType'
+import { ReplyModType } from '../../types/ModType'
 
-export const Test = (): ReplyModType => {
+export const Reply = (): ReplyModType => {
 	const name = '测试'
 	const isAlwaysReply: boolean = false
 	const keywords: string[] = []

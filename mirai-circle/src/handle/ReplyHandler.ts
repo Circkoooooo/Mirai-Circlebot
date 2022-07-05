@@ -1,6 +1,5 @@
 import { MessageType } from 'mirai-ts'
 import { DefaultHandler } from './DefaultHandler'
-import * as replyModList from '../mods/ReplyHandler'
 import { ReplyModType } from '../types/ModType'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -35,8 +34,6 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 	}
 	load() {
 		this.loadHandlerWhiteList()
-		this.loadMod()
-		this.createConfigFile()
 	}
 	/**
 	 * 监听ChatMessage消息，然后从这里开始处理
@@ -107,6 +104,8 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 				)
 				this.friendWhiteList = writeListTemplate.friendWhiteList
 				this.groupWhiteList = writeListTemplate.groupWhiteList
+
+				this.loadMod()
 			}
 		} catch (err) {
 			throw new Error('处理器白名单列表加载失败')
@@ -116,12 +115,56 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 	/**
 	 * 加载mod
 	 */
-	loadMod() {
-		for (const [name, obj] of Object.entries(replyModList)) {
-			const mod = obj()
+	async loadMod() {
+		try {
+			const modsDir = fs.existsSync(
+				path.resolve(path.resolve(process.cwd(), 'src/mods'))
+			)
+			if (!modsDir) {
+				fs.promises.mkdir(path.resolve(process.cwd(), 'src/mods'))
+			}
+			const modFile = path.resolve(process.cwd(), 'src/mods/index.ts')
+			const exist = fs.existsSync(modFile)
+			if (!exist) {
+				fs.writeFile(
+					path.join(modFile),
+					`export {Reply} from './Reply/Reply'//在这个文件中导出所有mod函数，你可以使用你的结构来导出。`,
+					'utf-8',
+					err => {
+						if (err) {
+							throw err
+						}
+					}
+				)
+				const data = await fs.promises.readFile(
+					path.resolve(__dirname, '../templates/template.txt'),
+					'utf-8'
+				)
+				await fs.promises.mkdir(
+					path.resolve(process.cwd(), 'src', 'mods', 'Reply')
+				)
+				await fs.promises.writeFile(
+					path.resolve(process.cwd(), 'src/mods/Reply/Reply.ts'),
+					data
+				)
+			}
+		} catch (err) {
+			throw err
+		}
+
+		const templateMod = require(path.resolve(
+			process.cwd(),
+			'src',
+			'mods',
+			'index.ts'
+		))
+
+		for (const item of Object.entries(templateMod)) {
+			const key = item[0]
+			const mod = templateMod[key]()
 			const isReplyMod = this.isOfType<ReplyModType>(mod, 'replyHandler')
 			if (isReplyMod) {
-				this.mods[name] = mod
+				this.mods[key] = mod
 			}
 		}
 		if (Object.keys(this.mods).length === 0) {
@@ -134,6 +177,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 			})
 			this.log.success(`模块[${avaMod.join(',')}]加载成功`)
 		}
+		this.createConfigFile()
 	}
 	/**
 	 * 验证白名单
@@ -154,6 +198,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 	 */
 	async createConfigFile() {
 		try {
+			this.log.info('正在生成配置文件')
 			//读取原有配置
 			const exist = fs.existsSync(this._modConfigPath)
 			let originConfig: ReplyModConfigType = {} as ReplyModConfigType
@@ -205,7 +250,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 				}
 			})
 
-			this.log.success('命令配置文件创建完成')
+			this.log.success('配置文件创建完成')
 			this.loadWhiteList(configTemplate)
 			this.loadKeywordConfig(configTemplate)
 		} catch (err) {
