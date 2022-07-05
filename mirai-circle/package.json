@@ -16,8 +16,8 @@
 	"version": "1.4.1",
 	"scripts": {
 		"build": "tsup",
-		"prepublish": "npm run build",
-		"postpublish": "nrm use npm && npm publish && nrm use taobao",
+		"prepublish": "npm run build && nrm use taobao",
+		"postpublish": "nrm use npm",
 		"release": "tsup && bump --commit --tag --push",
 		"dev": "nodemon src/index.ts",
 		"test": "echo \"Error: no test specified\" && exit 1"
