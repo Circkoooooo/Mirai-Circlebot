@@ -13,7 +13,7 @@
 	"main": "dist/index.js",
 	"name": "mirai-circlebot",
 	"description": "mirai-circlebot",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"scripts": {
 		"build": "tsup",
 		"release": "bump --commit --tag --push",
