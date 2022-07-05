@@ -13,10 +13,11 @@
 	"main": "dist/index.js",
 	"name": "mirai-circlebot",
 	"description": "mirai-circlebot",
-	"version": "1.3.0",
+	"version": "1.4.0",
 	"scripts": {
 		"build": "tsup",
-		"release": "bump --commit --tag --push",
+		"prepublish": "npm run build",
+		"release": "tsup && bump --commit --tag --push",
 		"dev": "nodemon src/index.ts",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
