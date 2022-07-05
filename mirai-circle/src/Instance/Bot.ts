@@ -31,7 +31,6 @@ export class CircleBot implements CircleBotType {
 	 * 配置文件的绝对目录
 	 */
 	configtPath: string
-
 	/**
 	 * log
 	 */
