@@ -120,6 +120,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 			const modsDir = fs.existsSync(
 				path.resolve(path.resolve(process.cwd(), 'src/mods'))
 			)
+			console.log(modsDir)
 			if (!modsDir) {
 				fs.promises.mkdir(path.resolve(process.cwd(), 'src/mods'))
 			}
@@ -136,10 +137,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 						}
 					}
 				)
-				const data = await fs.promises.readFile(
-					path.resolve(__dirname, '../templates/template.txt'),
-					'utf-8'
-				)
+				const data = template
 				await fs.promises.mkdir(
 					path.resolve(process.cwd(), 'src', 'mods', 'Reply')
 				)
@@ -322,3 +320,29 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 		return isKeyword.includes(true)
 	}
 }
+
+const template = `
+import { MessageType } from 'mirai-ts'
+import { ReplyModType } from 'mirai-circle'
+
+export const Reply = (): ReplyModType => {
+	const name = '测试'
+	const isAlwaysReply: boolean = false
+	const keywords: string[] = []
+	const keywordRule: RegExp[] = []
+	const whiteList: number[] = []
+
+	const reply = (msg: MessageType.MessageChain | string) => {
+		return '现在时间：' + new Date().toLocaleString()
+	}
+	return {
+		name,
+		keywords,
+		whiteList,
+		replyHandler: true,
+		reply,
+		isAlwaysReply,
+		keywordRule,
+	}
+}
+`
