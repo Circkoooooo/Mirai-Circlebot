@@ -1,5 +1,5 @@
-import { Message, MessageType } from 'mirai-ts'
-import { ReplyModType } from '../../../types/HandlerType'
+import { MessageType } from 'mirai-ts'
+import { ReplyModType } from '../../../types/ModType'
 
 export const Test = (): ReplyModType => {
 	const name = '测试'
@@ -9,7 +9,7 @@ export const Test = (): ReplyModType => {
 	const whiteList: number[] = []
 
 	const reply = (msg: MessageType.MessageChain | string) => {
-		return [Message.At(2389451262), Message.Plain('你好')]
+		return '现在时间：' + new Date().toLocaleString()
 	}
 	return {
 		name,

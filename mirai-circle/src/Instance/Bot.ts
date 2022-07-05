@@ -1,12 +1,12 @@
 import { Logger, Mirai, MiraiApiHttpSetting, MiraiInstance } from 'mirai-ts'
-import { CircleBot } from '../types/Bot'
+import { CircleBotType } from '../types/Bot'
 import { HandlerList, OtherUse } from '../types/UseType'
 import * as yaml from 'js-yaml'
 import * as fs from 'fs'
 import * as path from 'path'
 import { ReplyHandlerType } from '../types/HandlerType'
 
-export default class Bot implements CircleBot {
+export class CircleBot implements CircleBotType {
 	/**
 	 * 用户
 	 */

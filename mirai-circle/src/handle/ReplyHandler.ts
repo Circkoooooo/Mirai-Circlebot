@@ -1,7 +1,7 @@
 import { MessageType } from 'mirai-ts'
 import { DefaultHandler } from './DefaultHandler'
 import * as replyModList from '../mods/ReplyHandler'
-import { ReplyModType } from '../types/HandlerType'
+import { ReplyModType } from '../types/ModType'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as yaml from 'js-yaml'
@@ -9,8 +9,9 @@ import {
 	ReplyModConfigType,
 	ReplyWhiteListType,
 } from '../types/ReplyConfigType'
+import { ReplyHandlerType } from '../types/HandlerType'
 
-export class ReplyHandler extends DefaultHandler {
+export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 	handler: true
 	_modConfigPath: string
 	_whiteListPath: string

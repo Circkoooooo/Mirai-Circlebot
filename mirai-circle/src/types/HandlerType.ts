@@ -1,4 +1,5 @@
 import { Logger, MessageType } from 'mirai-ts'
+import { ReplyModType } from './ModType'
 export type DefaultHandlerType = {
 	readonly handler: true
 	_targetPath?: string
@@ -15,19 +16,5 @@ export interface ReplyHandlerType extends DefaultHandlerType {
 	loadMod: () => void
 	validateWhiteList: (msg: MessageType.ChatMessage) => boolean
 	createConfigFile: () => void
-	mods: { [key: string]: () => ReplyModType }
-}
-/**
- * 用于mod类实现
- */
-export interface ReplyModType {
-	readonly replyHandler: true
-	name: string
-	isAlwaysReply?: boolean
-	keywords: string[]
-	keywordRule?: RegExp[]
-	whiteList: number[]
-	reply: (
-		msg: MessageType.MessageChain | string
-	) => MessageType.MessageChain | string
+	mods: { [key: string]: ReplyModType }
 }
