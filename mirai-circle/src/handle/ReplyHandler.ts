@@ -40,23 +40,45 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 	 * @param msg
 	 */
 	watchChatMessage(msg: MessageType.ChatMessage): void {
-		// 这里需要执行的逻辑有：白名单拦截，提取命令文本，通过mod处理文本，..
+		//处理器白名单拦截
 		if (!this.validateWhiteList(msg)) {
 			this.log.info('非白名单' + this.msgLog(msg))
 			return
 		}
 		this.log.info(this.msgLog(msg))
+		// 处理回复
+		let reply = {
+			always: false,
+			whiteList: false,
+			keyword: false,
+			canReply: false,
+		}
 		for (const item of Object.entries(this.mods)) {
-			if (!this.filterWhiteList(item[1], msg)) {
-				continue
+			if (item[1].isAlwaysReply) {
+				reply.always = true
 			}
-			//拦截关键词
-			if (!this.filterKeywordList(item[1], msg)) {
-				continue
+			// 白名单拦截 如果是always 就不用判断，直接走就行了
+			if (!reply.always || this.filterWhiteList(item[1], msg)) {
+				reply.whiteList = true
 			}
-			this.replyChatMessage(msg, item[1].reply(msg.plain))
+			//拦截关键词 如果whiteList是true说明不是always。如果是false就说明没有通过白名单
+			if (reply.whiteList && this.filterKeywordList(item[1], msg)) {
+				reply.keyword = true
+			}
+
+			if (reply.always || (reply.whiteList && reply.keyword)) {
+				reply.canReply = true
+			}
+			if (reply.canReply) {
+				this.replyChatMessage(msg, item[1].reply(msg.plain, this))
+			}
 		}
 	}
+	/**
+	 *
+	 * @param msg 接受到的消息
+	 * @param sendMsg 处理好的MessageChain或者stirng
+	 */
 	replyChatMessage(
 		msg: MessageType.ChatMessage,
 		sendMsg: MessageType.MessageChain | string
@@ -65,6 +87,9 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 			this.log.info(`我回复->${sendMsg}`)
 		})
 	}
+	/**
+	 * 加载白名单列表
+	 */
 	async loadHandlerWhiteList() {
 		this.log.info('正在加载处理器白名单列表')
 		const exist = fs.existsSync(this._whiteListPath)
@@ -262,10 +287,10 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 		for (const [key, obj] of Object.entries(this.mods)) {
 			const config = configTemplate[key]
 			if (config.whiteList !== undefined) {
+				obj.isAlwaysReply = config.isAlwaysReply
 				obj.whiteList = config.whiteList
 			}
 		}
-
 		this.log.success('命令白名单列表加载成功')
 	}
 
