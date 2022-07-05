@@ -1,3 +1,4 @@
+import { ReplyHandler } from './handle'
 import { CircleBot } from './Instance/Bot'
 
 // 机器人

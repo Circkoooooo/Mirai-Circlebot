@@ -70,7 +70,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 				reply.canReply = true
 			}
 			if (reply.canReply) {
-				this.replyChatMessage(msg, item[1].reply(msg.plain, this))
+				this.replyChatMessage(msg, item[1].reply(msg.plain, this,msg))
 			}
 		}
 	}
