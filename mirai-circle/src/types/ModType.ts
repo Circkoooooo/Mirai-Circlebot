@@ -36,8 +36,8 @@ export type ReplyModType = {
 	 * 传入的Handler的实例
 	 */
 	reply: (
-		msg: MessageType.MessageChain | string,
-		handlerInstance?: ReplyHandler,
-		rawMsg?: MessageType.ChatMessage
-	) => MessageType.MessageChain | string
+		handlerInstance: ReplyHandler,
+		msg: MessageType.ChatMessage,
+		msgText?: MessageType.MessageChain | string
+	) => void
 }

@@ -39,7 +39,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 	 * 监听ChatMessage消息，然后从这里开始处理
 	 * @param msg
 	 */
-	watchChatMessage(msg: MessageType.ChatMessage): void {
+	watchChatMessage(msg: MessageType.ChatMessage) {
 		//处理器白名单拦截
 		if (!this.validateWhiteList(msg)) {
 			this.log.info('非白名单' + this.msgLog(msg))
@@ -69,20 +69,21 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 			if (reply.always || (reply.whiteList && reply.keyword)) {
 				reply.canReply = true
 			}
+			// 返回一个promise
 			if (reply.canReply) {
-				this.replyChatMessage(msg, item[1].reply(msg.plain, this,msg))
+				item[1].reply(this, msg, msg.plain)
 			}
 		}
 	}
 	/**
-	 *
-	 * @param msg 接受到的消息
+	 * 发送消息
+	 * @param msg 接受到的消息 rawMessage
 	 * @param sendMsg 处理好的MessageChain或者stirng
 	 */
-	replyChatMessage(
+	send(
 		msg: MessageType.ChatMessage,
 		sendMsg: MessageType.MessageChain | string
-	): void {
+	) {
 		msg.reply(sendMsg).then(() => {
 			this.log.info(`我回复->${sendMsg}`)
 		})
@@ -347,8 +348,12 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 
 const template = `
 import { MessageType } from 'mirai-ts'
-import { ReplyModType } from 'mirai-circlebot'
+import { ReplyHandler,ReplyModType } from 'mirai-circlebot'
 
+/**
+ *
+ * @returns 一些配置可以根据ReplyModType来查看
+ */
 export const Reply = (): ReplyModType => {
 	const name = '测试'
 	const isAlwaysReply: boolean = false
@@ -356,9 +361,16 @@ export const Reply = (): ReplyModType => {
 	const keywordRule: RegExp[] = []
 	const whiteList: number[] = []
 
-	const reply = (msg: MessageType.MessageChain | string) => {
-		return '现在时间：' + new Date().toLocaleString()
+	const reply = (
+		handler: ReplyHandler,
+		rawMsg: MessageType.ChatMessage,
+		msg?: MessageType.MessageChain | string
+	) => {
+		setTimeout(() => {
+			handler.send(rawMsg, msg + 'hello')
+		}, 3000)
 	}
+
 	return {
 		name,
 		keywords,

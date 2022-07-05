@@ -6,7 +6,7 @@ export type DefaultHandlerType = {
 	log: Logger
 	load(): void
 	watchChatMessage(msg: MessageType.ChatMessage): void
-	replyChatMessage(
+	send(
 		msg: MessageType.ChatMessage,
 		sendMsg: MessageType.MessageChain | string
 	): void

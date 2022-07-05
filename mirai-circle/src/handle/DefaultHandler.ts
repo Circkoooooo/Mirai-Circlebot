@@ -11,7 +11,7 @@ export abstract class DefaultHandler implements DefaultHandlerType {
 		this.log = new Logger()
 	}
 	abstract watchChatMessage(msg: MessageType.ChatMessage): void
-	abstract replyChatMessage(
+	abstract send(
 		msg: MessageType.ChatMessage,
 		sendMsg: MessageType.MessageChain | string
 	): void
