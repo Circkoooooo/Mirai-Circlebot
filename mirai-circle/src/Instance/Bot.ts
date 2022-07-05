@@ -42,8 +42,8 @@ export class CircleBot implements CircleBotType {
 	 */
 	constructor(qq: number, settingPath: string) {
 		this.log = new Logger()
-		if (!fs.existsSync(path.resolve('configs'))) {
-			fs.mkdirSync(path.resolve('configs'))
+		if (!fs.existsSync(path.resolve(process.cwd(), 'configs'))) {
+			fs.mkdirSync(path.resolve(process.cwd(), 'configs'))
 		}
 		this.configtPath = ''
 		const settingConfig = this.resolveApiHttpConfig(settingPath)
@@ -90,7 +90,7 @@ export class CircleBot implements CircleBotType {
 		if (isAbsolute) {
 			sPath = settingPath
 		} else {
-			sPath = path.resolve(__dirname, settingPath)
+			sPath = path.resolve(process.cwd(), settingPath)
 		}
 		this.configtPath = sPath
 		try {
@@ -100,7 +100,7 @@ export class CircleBot implements CircleBotType {
 
 			return setting
 		} catch (err) {
-			throw new Error('没有找到setting.yml的配置文件，请检查路径是否正确。')
+			throw new Error('没有找到' + sPath + '的配置文件，请检查路径是否正确。')
 		}
 	}
 }
