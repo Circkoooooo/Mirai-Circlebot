@@ -28,7 +28,7 @@ export class CircleBot implements CircleBotType {
 	 */
 	OtherUse: Array<OtherUse>
 	/**
-	 * 配置文件的目录
+	 * 配置文件的绝对目录
 	 */
 	configtPath: string
 
@@ -40,16 +40,15 @@ export class CircleBot implements CircleBotType {
 	 * user
 	 * httpsetting
 	 */
-	constructor(qq: number) {
+	constructor(qq: number, settingPath: string) {
 		this.log = new Logger()
 		if (!fs.existsSync(path.resolve('configs'))) {
 			fs.mkdirSync(path.resolve('configs'))
 		}
-		this.configtPath = path.resolve('configs/BotConfig')
-		const settingConfig = resolveApiHttpConfig()
+		this.configtPath = ''
+		const settingConfig = this.resolveApiHttpConfig(settingPath)
 		this.setting = settingConfig as MiraiApiHttpSetting
 		this.qq = qq
-
 		this.mirai = new Mirai(settingConfig)
 		this.OtherUse = []
 		this.handlerList = []
@@ -59,12 +58,16 @@ export class CircleBot implements CircleBotType {
 	 * @param useMod
 	 */
 	use(useMod: HandlerList | OtherUse) {
+		this.log.info('正在加载处理器')
 		const handler = isOfType<ReplyHandlerType>(useMod, 'handler')
 		if (handler) {
+			useMod.load()
 			this.handlerList.push(useMod as HandlerList)
 		} else {
 			this.OtherUse.push(useMod as OtherUse)
+			this.log.warning('加载了一个非内置的处理器，请注意是否是正确的处理器。')
 		}
+		this.log.success('处理器加载成功')
 	}
 
 	start() {
@@ -76,6 +79,30 @@ export class CircleBot implements CircleBotType {
 		})
 		this.mirai?.listen()
 	}
+	/**
+	 * 处理setting.yml路径
+	 * @param settingPath
+	 * @returns
+	 */
+	resolveApiHttpConfig = (settingPath: string) => {
+		let sPath = ''
+		const isAbsolute = path.isAbsolute(settingPath)
+		if (isAbsolute) {
+			sPath = settingPath
+		} else {
+			sPath = path.resolve(__dirname, settingPath)
+		}
+		this.configtPath = sPath
+		try {
+			const setting = yaml.load(
+				fs.readFileSync(sPath, 'utf8')
+			) as MiraiApiHttpSetting
+
+			return setting
+		} catch (err) {
+			throw new Error('没有找到setting.yml的配置文件，请检查路径是否正确。')
+		}
+	}
 }
 
 /**
@@ -86,24 +113,4 @@ export class CircleBot implements CircleBotType {
  */
 function isOfType<T>(use: any, propertyToCheckFor: keyof T): use is T {
 	return (use as T)[propertyToCheckFor] !== undefined
-}
-/**
- * 处理setting路径
- * @returns
- */
-const resolveApiHttpConfig = () => {
-	let filePath = ''
-	filePath = path.resolve('../mcl/config/net.mamoe.mirai-api-http/setting.yml')
-
-	try {
-		const setting = yaml.load(
-			fs.readFileSync(filePath, 'utf8')
-		) as MiraiApiHttpSetting
-		return setting
-	} catch (err) {
-		new Logger().error(
-			'请将项目文件夹放在和mcl相同的根目录下，以读取mcl中的config配置'
-		)
-		return
-	}
 }

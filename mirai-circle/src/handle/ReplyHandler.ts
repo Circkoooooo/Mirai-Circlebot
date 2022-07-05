@@ -26,6 +26,8 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 		this.groupWhiteList = []
 		this.friendWhiteList = []
 		this.mods = {}
+	}
+	load() {
 		this.loadHandlerWhiteList()
 		this.loadMod()
 		this.createConfigFile()

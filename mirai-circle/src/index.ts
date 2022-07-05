@@ -1,8 +1,5 @@
 import { CircleBot } from './Instance/Bot'
 
-import { Mirai } from 'mirai-ts'
-export { Mirai }
-
 // 机器人
 export { CircleBot }
 // Handler相关类型

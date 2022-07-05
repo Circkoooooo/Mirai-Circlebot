@@ -16,6 +16,7 @@ export abstract class DefaultHandler implements DefaultHandlerType {
 		sendMsg: MessageType.MessageChain | string
 	): void
 
+	abstract load(): void
 	isOfType<T>(use: any, propertyToCheckFor: keyof T): use is T {
 		return (use as T)[propertyToCheckFor] !== undefined
 	}
