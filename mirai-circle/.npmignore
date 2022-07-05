@@ -1,3 +1,4 @@
 *.ts
 !*.d.ts
 src/
+tsconfig.json
