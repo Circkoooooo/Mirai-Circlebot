@@ -132,7 +132,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 				this.groupWhiteList = writeListTemplate.groupWhiteList
 			}
 		} catch (err) {
-			throw new Error('处理器白名单列表加载失败')
+			this.log.error('请检查ReplyWhiteList白名单是否配置正确')
 		}
 		this.log.success('处理器白名单列表加载成功')
 		this.loadMod()
@@ -265,6 +265,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 			}
 
 			const configContent = yaml.dump(configTemplate)
+			console.log(configContent)
 			// 写入配置
 			fs.writeFile(this._modConfigPath, configContent, 'utf-8', err => {
 				if (err) {
@@ -276,7 +277,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 			this.loadWhiteList(configTemplate)
 			this.loadKeywordConfig(configTemplate)
 		} catch (err) {
-			throw new Error('配置文档生成失败')
+			this.log.error('请检查配置文件是否正确')
 		}
 	}
 	/**
@@ -301,10 +302,14 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 			if (config.keywords !== undefined) {
 				obj.keywords = config.keywords
 			}
-			if (config.keywordRule !== undefined) {
-				obj.keywordRule = config.keywordRule.map(regList => {
-					return new RegExp(regList, 'g')
-				})
+			try {
+				if (config.keywordRule !== undefined) {
+					obj.keywordRule = config.keywordRule.map(regList => {
+						return new RegExp(regList)
+					})
+				}
+			} catch (err) {
+				this.log.error('请提供一个正确的正则表达式。->' + key)
 			}
 		}
 		this.log.success('关键词配置加载成功')
@@ -341,6 +346,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 			)
 		}
 		isKeyword.push(modInstance.keywords.includes(msg.plain))
+		console.log(isKeyword.includes(true))
 		return isKeyword.includes(true)
 	}
 }
