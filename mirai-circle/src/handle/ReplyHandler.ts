@@ -334,11 +334,15 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 				})
 			)
 		}
-		isKeyword.push(
-			modInstance.keywords.some(value => {
-				return msg.plain.includes(value)
-			})
-		)
+		if (typeof modInstance.keywords === 'string') {
+			isKeyword.push(msg.plain.includes(modInstance.keywords))
+		} else {
+			isKeyword.push(
+				modInstance.keywords.some(value => {
+					return msg.plain.includes(value)
+				})
+			)
+		}
 		return isKeyword.includes(true)
 	}
 }
