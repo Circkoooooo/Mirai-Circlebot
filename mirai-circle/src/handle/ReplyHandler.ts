@@ -265,7 +265,6 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 			}
 
 			const configContent = yaml.dump(configTemplate)
-			console.log(configContent)
 			// 写入配置
 			fs.writeFile(this._modConfigPath, configContent, 'utf-8', err => {
 				if (err) {
@@ -346,7 +345,6 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 			)
 		}
 		isKeyword.push(modInstance.keywords.includes(msg.plain))
-		console.log(isKeyword.includes(true))
 		return isKeyword.includes(true)
 	}
 }
