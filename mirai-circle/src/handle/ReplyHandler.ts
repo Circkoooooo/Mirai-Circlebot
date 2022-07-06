@@ -130,13 +130,12 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 				)
 				this.friendWhiteList = writeListTemplate.friendWhiteList
 				this.groupWhiteList = writeListTemplate.groupWhiteList
-
-				this.loadMod()
 			}
 		} catch (err) {
 			throw new Error('处理器白名单列表加载失败')
 		}
 		this.log.success('处理器白名单列表加载成功')
+		this.loadMod()
 	}
 	/**
 	 * 加载mod
