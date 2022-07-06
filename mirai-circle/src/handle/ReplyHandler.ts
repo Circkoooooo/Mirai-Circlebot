@@ -95,12 +95,12 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 		this.log.info('正在加载处理器白名单列表')
 		const exist = fs.existsSync(this._whiteListPath)
 		try {
-			const whiteListTemplate: ReplyWhiteListType = {
-				groupWhiteList: [],
-				friendWhiteList: [],
-			}
-			const whiteList = yaml.dump(whiteListTemplate)
 			if (!exist) {
+				const whiteListTemplate: ReplyWhiteListType = {
+					groupWhiteList: [],
+					friendWhiteList: [],
+				}
+				const whiteList = yaml.dump(whiteListTemplate)
 				fs.writeFile(this._whiteListPath, whiteList, 'utf-8', err => {
 					if (err) {
 						throw err
@@ -118,16 +118,6 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 					groupWhiteList: groupWhiteList === undefined ? [] : groupWhiteList,
 					friendWhiteList: friendWhiteList === undefined ? [] : friendWhiteList,
 				}
-				fs.writeFile(
-					this._whiteListPath,
-					yaml.dump(writeListTemplate),
-					'utf-8',
-					err => {
-						if (err) {
-							throw err
-						}
-					}
-				)
 				this.friendWhiteList = writeListTemplate.friendWhiteList
 				this.groupWhiteList = writeListTemplate.groupWhiteList
 			}
