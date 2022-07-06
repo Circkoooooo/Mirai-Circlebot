@@ -2,7 +2,7 @@
 
 ## 快速上手
 ```
-npm i mirai-circle
+npm i mirai-circlebot
 ```
 ### 尝试登录
 使用**mcl**登录一个qq
