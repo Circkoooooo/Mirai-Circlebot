@@ -4,3 +4,4 @@ src/
 tsconfig.json
 configs/
 mods/
+index.dev.ts

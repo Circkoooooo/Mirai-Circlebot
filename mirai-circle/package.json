@@ -19,7 +19,7 @@
 		"prepublish": "npm run build && nrm use npm",
 		"postpublish": "nrm use taobao",
 		"release": "tsup && bump --commit --tag --push",
-		"dev": "nodemon src/index.ts",
+		"dev": "nodemon src/index.dev.ts",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"author": "",

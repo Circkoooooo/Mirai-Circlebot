@@ -47,13 +47,13 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 		}
 		this.log.info(this.msgLog(msg))
 		// 处理回复
-		let reply = {
-			always: false,
-			whiteList: false,
-			keyword: false,
-			canReply: false,
-		}
 		for (const item of Object.entries(this.mods)) {
+			let reply = {
+				always: false,
+				whiteList: false,
+				keyword: false,
+				canReply: false,
+			}
 			if (item[1].isAlwaysReply) {
 				reply.always = true
 			}
@@ -69,7 +69,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 			if (reply.always || (reply.whiteList && reply.keyword)) {
 				reply.canReply = true
 			}
-			// 返回一个promise
+
 			if (reply.canReply) {
 				item[1].reply(this, msg, msg.plain)
 			}

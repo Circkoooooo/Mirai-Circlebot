@@ -18,9 +18,7 @@ export const Reply = (): ReplyModType => {
 		rawMsg: MessageType.ChatMessage,
 		msg?: MessageType.MessageChain | string
 	) => {
-		setTimeout(() => {
-			handler.send(rawMsg, msg + 'hello')
-		}, 3000)
+		handler.send(rawMsg, msg + 'hello')
 	}
 
 	return {
