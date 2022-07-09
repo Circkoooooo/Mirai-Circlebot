@@ -13,7 +13,7 @@
 	"main": "dist/index.js",
 	"name": "mirai-circlebot",
 	"description": "mirai-circlebot",
-	"version": "2.1.6",
+	"version": "2.2.0",
 	"scripts": {
 		"build": "tsup",
 		"prepublish": "npm run build && nrm use npm",
