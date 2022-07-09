@@ -1,4 +1,4 @@
-export type ReplyWhiteListType = {
+export type HandlerWhiteListType = {
 	groupWhiteList: Array<number>
 	friendWhiteList: Array<number>
 }

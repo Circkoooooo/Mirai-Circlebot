@@ -1,40 +1,30 @@
 import { MessageType } from 'mirai-ts'
 import { DefaultHandler } from './DefaultHandler'
 import { ReplyModType } from '../types/ModType'
-import * as fs from 'fs'
-import * as path from 'path'
-import * as yaml from 'js-yaml'
-import {
-	ReplyModConfigType,
-	ReplyWhiteListType,
-} from '../types/ReplyConfigType'
-import { ReplyHandlerType } from '../types/HandlerType'
+import fs from 'fs'
+import path from 'path'
+import yaml from 'js-yaml'
+import { ReplyModConfigType } from '../types/ReplyConfigType'
+import { HandlerType, ReplyHandlerType } from '../types/HandlerType'
 
 export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 	handler: true
+	type: HandlerType
 	_modConfigPath: string
-	_whiteListPath: string
-	groupWhiteList: Array<number>
-	friendWhiteList: Array<number>
 	mods: { [key: string]: ReplyModType }
+
 	constructor() {
 		super()
+		this.type = 'Message'
 		this._modConfigPath = path.resolve(
 			process.cwd(),
 			'configs/ReplyModConfig.yml'
 		)
-		this._whiteListPath = path.resolve(
-			process.cwd(),
-			'configs/ReplyWhiteList.yml'
-		)
 		this.handler = true
-		this.groupWhiteList = []
-		this.friendWhiteList = []
 		this.mods = {}
+		this.loadMod()
 	}
-	load() {
-		this.loadHandlerWhiteList()
-	}
+
 	/**
 	 * 监听ChatMessage消息，然后从这里开始处理
 	 * @param msg
@@ -88,45 +78,7 @@ export class ReplyHandler extends DefaultHandler implements ReplyHandlerType {
 			this.log.info(`我回复->${sendMsg}`)
 		})
 	}
-	/**
-	 * 加载白名单列表
-	 */
-	async loadHandlerWhiteList() {
-		this.log.info('正在加载处理器白名单列表')
-		const exist = fs.existsSync(this._whiteListPath)
-		try {
-			if (!exist) {
-				const whiteListTemplate: ReplyWhiteListType = {
-					groupWhiteList: [],
-					friendWhiteList: [],
-				}
-				const whiteList = yaml.dump(whiteListTemplate)
-				fs.writeFile(this._whiteListPath, whiteList, 'utf-8', err => {
-					if (err) {
-						throw err
-					}
-				})
-			} else {
-				const res = await fs.promises.readFile(this._whiteListPath, 'utf-8')
-				const originWhiteList = yaml.load(res) as ReplyWhiteListType
-				const { groupWhiteList, friendWhiteList } =
-					originWhiteList === undefined
-						? ({} as ReplyWhiteListType)
-						: originWhiteList
 
-				const writeListTemplate: ReplyWhiteListType = {
-					groupWhiteList: groupWhiteList === undefined ? [] : groupWhiteList,
-					friendWhiteList: friendWhiteList === undefined ? [] : friendWhiteList,
-				}
-				this.friendWhiteList = writeListTemplate.friendWhiteList
-				this.groupWhiteList = writeListTemplate.groupWhiteList
-			}
-		} catch (err) {
-			this.log.error('请检查ReplyWhiteList白名单是否配置正确')
-		}
-		this.log.success('处理器白名单列表加载成功')
-		this.loadMod()
-	}
 	/**
 	 * 加载mod
 	 */

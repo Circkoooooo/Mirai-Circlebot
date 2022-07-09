@@ -1,25 +1,42 @@
-import { Logger } from 'mirai-ts'
-import { DefaultHandlerType } from '../types/HandlerType'
+import { EventType, Logger, MiraiInstance } from 'mirai-ts'
+import { DefaultHandlerType, HandlerType } from '../types/HandlerType'
 import { MessageType } from 'mirai-ts'
 
 export abstract class DefaultHandler implements DefaultHandlerType {
 	handler: true
+	mirai: MiraiInstance
 	log: Logger
-
+	groupWhiteList: Array<number>
+	friendWhiteList: Array<number>
+	abstract type: HandlerType
 	constructor() {
 		this.handler = true
 		this.log = new Logger()
+		this.groupWhiteList = []
+		this.friendWhiteList = []
+		this.mirai = {} as MiraiInstance
 	}
-	abstract watchChatMessage(msg: MessageType.ChatMessage): void
+	watchChatMessage(msg: MessageType.ChatMessage): void {}
+	watchNudge(event: EventType.BaseEvent): void {}
 	abstract send(
 		msg: MessageType.ChatMessage,
 		sendMsg: MessageType.MessageChain | string
 	): void
 
-	abstract load(): void
+	load(
+		friendWhiteList: number[],
+		groupWhiteList: number[],
+		mirai: MiraiInstance
+	) {
+		this.friendWhiteList = friendWhiteList
+		this.groupWhiteList = groupWhiteList
+		this.mirai = mirai
+	}
+
 	isOfType<T>(use: any, propertyToCheckFor: keyof T): use is T {
 		return (use as T)[propertyToCheckFor] !== undefined
 	}
+
 	/**
 	 * 打印 接收到的信息
 	 * @param msg

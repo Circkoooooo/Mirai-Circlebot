@@ -1,5 +1,6 @@
-import { MessageType } from 'mirai-ts'
+import { EventType, MessageType } from 'mirai-ts'
 import { ReplyHandler } from '../handle'
+import { NudgeHandlerType } from './HandlerType'
 
 /**
  * 用于mod类实现
@@ -40,4 +41,13 @@ export type ReplyModType = {
 		msg: MessageType.ChatMessage,
 		msgText?: MessageType.MessageChain | string
 	) => void
+}
+
+/**
+ * 用于mod类实现
+ */
+export type NudgeModType = {
+	readonly nudgeHandler: true
+	name: string
+	reply(handler: NudgeHandlerType, event: EventType.NudgeEvent): void
 }
