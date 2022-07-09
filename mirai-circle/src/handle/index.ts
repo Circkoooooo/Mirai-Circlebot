@@ -1,3 +1,3 @@
-import { ReplyHandler } from './ReplyHandler'
-import { DefaultHandler } from './DefaultHandler'
-export { ReplyHandler, DefaultHandler }
+export { ReplyHandler } from './ReplyHandler'
+export { NudgeHandler } from './NudgeHandler'
+export { DefaultHandler } from './DefaultHandler'
